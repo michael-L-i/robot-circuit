@@ -1,0 +1,11 @@
+[project]
+name = "robot-circuit"
+version = "0.1.0"
+description = "Local Gemma breadboard inspection with LiteRT-LM"
+requires-python = ">=3.12,<3.14"
+dependencies = ["fastapi==0.162.0", "uvicorn==0.54.0", "pillow==13.0.0", "litert-lm==0.18.1"]
+[dependency-groups]
+dev = ["pytest==9.1.1", "httpx==0.28.1"]
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]

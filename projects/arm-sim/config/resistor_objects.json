@@ -1,0 +1,95 @@
+{
+ "schema_version": 1,
+ "dictionary": "DICT_4X4_50",
+ "units": "meters",
+ "note": "Demo 2 (resistor swap). Offsets are in marker frames: taught grasp/contact points, measured on hardware.",
+ "objects": {
+  "probe": {
+   "marker_id": 1,
+   "marker_size": 0.024,
+   "target_offset": [
+    -0.045,
+    0,
+    -0.022
+   ],
+   "point_offset": [
+    -0.045,
+    0,
+    -0.0842
+   ]
+  },
+  "resistor_a": {
+   "marker_id": 6,
+   "marker_size": 0.024,
+   "target_offset": [
+    0,
+    -0.045,
+    -0.006
+   ],
+   "point_offset": [
+    0,
+    -0.045,
+    -0.023
+   ]
+  },
+  "resistor_b": {
+   "marker_id": 7,
+   "marker_size": 0.024,
+   "target_offset": [
+    0,
+    -0.045,
+    -0.006
+   ],
+   "point_offset": [
+    0,
+    -0.045,
+    -0.023
+   ]
+  },
+  "tp_in": {
+   "marker_id": 8,
+   "marker_size": 0.024,
+   "target_offset": [
+    -0.032,
+    0,
+    0
+   ]
+  },
+  "tp_out": {
+   "marker_id": 9,
+   "marker_size": 0.024,
+   "target_offset": [
+    -0.032,
+    0,
+    0
+   ]
+  },
+  "socket": {
+   "marker_id": 10,
+   "marker_size": 0.024,
+   "target_offset": [
+    0.04,
+    0,
+    0.0025
+   ]
+  },
+  "reject_bin": {
+   "marker_id": 11,
+   "marker_size": 0.024,
+   "target_offset": [
+    -0.05,
+    0,
+    0.001
+   ]
+  },
+  "probe_dock": {
+   "marker_id": 5,
+   "marker_size": 0.024,
+   "target_offset": [
+    0,
+    0.04,
+    -0.001
+   ]
+  }
+ }
+}

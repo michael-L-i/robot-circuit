@@ -1,0 +1,163 @@
+{
+  "schema_version": 1,
+  "simulation": true,
+  "arm": "YAM Ultra v1 URDF, simplified links",
+  "units": "meters/radians/volts",
+  "state": {
+    "tool": null,
+    "measurements": [
+      {
+        "voltage": null,
+        "valid_contact": false,
+        "led_on": false,
+        "after_placement": false
+      }
+    ],
+    "jumper_xyz": [
+      0.3057719863559959,
+      0.07301698347849003,
+      0.065
+    ],
+    "targets": {
+      "probe_dock": [
+        0.23,
+        -0.15,
+        0.1
+      ],
+      "test_pad": [
+        0.35,
+        -0.035,
+        0.065
+      ],
+      "copper_mesh": [
+        0.35,
+        0.035,
+        0.065
+      ]
+    },
+    "led_visible": false,
+    "placed": false,
+    "allowed_actions": [],
+    "revision": 4,
+    "q": [
+      -0.5815461583678276,
+      1.6289356971489646,
+      1.0662188590894253,
+      -1.0082566168294607,
+      2.2283186207137197e-07,
+      0.0
+    ],
+    "tcp": [
+      0.22978932162820356,
+      -0.14986149952707373,
+      0.10006600515236422
+    ],
+    "links": [
+      [
+        0.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        0.0733
+      ],
+      [
+        -0.001332763442677156,
+        -0.03843626206598749,
+        0.11880000000000653
+      ],
+      [
+        0.04872934856307548,
+        0.009791790876499569,
+        0.38235394106501913
+      ],
+      [
+        0.21139107228224988,
+        -0.17827677026630145,
+        0.30239916667678457
+      ],
+      [
+        0.26365091264793966,
+        -0.17212141504374706,
+        0.23200692946537899
+      ],
+      [
+        0.2298026536144958,
+        -0.14987023971487104,
+        0.19006600374051563
+      ],
+      [
+        0.22978932162820356,
+        -0.14986149952707373,
+        0.10006600515236422
+      ]
+    ],
+    "electrical": {
+      "contact": false,
+      "node_v": 0.0,
+      "current_ma": 0.0,
+      "led_on": false
+    },
+    "done": true,
+    "success": false,
+    "events": [
+      {
+        "step": 1,
+        "action": "pick_probe",
+        "note": "pick probe",
+        "decision": {
+          "action": "pick_probe",
+          "reason": "The probe needs to be picked up to begin the measurement sequence as per the instructions.",
+          "model": "gemma-4-E4B-it.litertlm",
+          "seconds": 1.09,
+          "source": "local Gemma E4B"
+        }
+      },
+      {
+        "step": 2,
+        "action": "measure",
+        "note": "No probe contact \u2014 reading unavailable (not 0 V)",
+        "decision": {
+          "action": "measure",
+          "reason": "The probe is picked up and needs to be measured at the test pad before proceeding with the jumper placement.",
+          "model": "gemma-4-E4B-it.litertlm",
+          "seconds": 1.22,
+          "source": "local Gemma E4B"
+        }
+      },
+      {
+        "step": 3,
+        "action": "dock_probe",
+        "note": "dock probe",
+        "decision": {
+          "action": "dock_probe",
+          "reason": "The most recent measurement resulted in a null voltage, requiring the probe to be docked before any further action.",
+          "model": "gemma-4-E4B-it.litertlm",
+          "seconds": 1.26,
+          "source": "local Gemma E4B"
+        }
+      },
+      {
+        "step": 4,
+        "action": "abort",
+        "note": "abort",
+        "decision": {
+          "action": "abort",
+          "reason": "The most recent measurement resulted in a null voltage and the probe is docked, which requires aborting the repair.",
+          "model": "gemma-4-E4B-it.litertlm",
+          "seconds": 1.94,
+          "source": "local Gemma E4B"
+        }
+      }
+    ],
+    "config": {
+      "scenario": "misplaced",
+      "seed": 7,
+      "placement_error_mm": 0,
+      "probe_error_mm": 25.0
+    },
+    "simulation": true
+  }
+}

@@ -1,0 +1,125 @@
+{
+  "conditions": "20 jumper layouts; ideal calibrated camera; no noise; taught marker IDs; scripted task policy",
+  "runs": [
+    {
+      "seed": 0,
+      "success": true,
+      "initial_jumper_error_mm": 0.95,
+      "steps": 9
+    },
+    {
+      "seed": 1,
+      "success": true,
+      "initial_jumper_error_mm": 1.08,
+      "steps": 9
+    },
+    {
+      "seed": 2,
+      "success": true,
+      "initial_jumper_error_mm": 3.13,
+      "steps": 9
+    },
+    {
+      "seed": 3,
+      "success": true,
+      "initial_jumper_error_mm": 1.77,
+      "steps": 9
+    },
+    {
+      "seed": 4,
+      "success": true,
+      "initial_jumper_error_mm": 1.47,
+      "steps": 9
+    },
+    {
+      "seed": 5,
+      "success": true,
+      "initial_jumper_error_mm": 0.63,
+      "steps": 9
+    },
+    {
+      "seed": 6,
+      "success": true,
+      "initial_jumper_error_mm": 1.86,
+      "steps": 9
+    },
+    {
+      "seed": 7,
+      "success": true,
+      "initial_jumper_error_mm": 0.66,
+      "steps": 9
+    },
+    {
+      "seed": 8,
+      "success": true,
+      "initial_jumper_error_mm": 3.62,
+      "steps": 9
+    },
+    {
+      "seed": 9,
+      "success": true,
+      "initial_jumper_error_mm": 1.49,
+      "steps": 9
+    },
+    {
+      "seed": 10,
+      "success": true,
+      "initial_jumper_error_mm": 1.58,
+      "steps": 9
+    },
+    {
+      "seed": 11,
+      "success": true,
+      "initial_jumper_error_mm": 1.16,
+      "steps": 9
+    },
+    {
+      "seed": 12,
+      "success": true,
+      "initial_jumper_error_mm": 2.63,
+      "steps": 9
+    },
+    {
+      "seed": 13,
+      "success": true,
+      "initial_jumper_error_mm": 0.71,
+      "steps": 9
+    },
+    {
+      "seed": 14,
+      "success": true,
+      "initial_jumper_error_mm": 0.74,
+      "steps": 9
+    },
+    {
+      "seed": 15,
+      "success": true,
+      "initial_jumper_error_mm": 1.35,
+      "steps": 9
+    },
+    {
+      "seed": 16,
+      "success": true,
+      "initial_jumper_error_mm": 1.38,
+      "steps": 9
+    },
+    {
+      "seed": 17,
+      "success": true,
+      "initial_jumper_error_mm": 0.44,
+      "steps": 9
+    },
+    {
+      "seed": 18,
+      "success": true,
+      "initial_jumper_error_mm": 0.8,
+      "steps": 9
+    },
+    {
+      "seed": 19,
+      "success": true,
+      "initial_jumper_error_mm": 1.93,
+      "steps": 9
+    }
+  ]
+}

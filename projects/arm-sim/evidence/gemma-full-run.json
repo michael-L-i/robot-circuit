@@ -1,0 +1,91 @@
+{
+ "success": true,
+ "measurements": [
+  {
+   "voltage": 0.0,
+   "valid_contact": true,
+   "led_on": false,
+   "after_placement": false
+  },
+  {
+   "voltage": 5.0,
+   "valid_contact": true,
+   "led_on": true,
+   "after_placement": true
+  }
+ ],
+ "steps": [
+  {
+   "step": 1,
+   "action": "pick_probe",
+   "seconds": 1.46,
+   "reason": "The probe needs to be picked up to begin the measurement sequence as per the repair instructions.",
+   "note": "pick probe",
+   "ok": true
+  },
+  {
+   "step": 2,
+   "action": "measure",
+   "seconds": 1.42,
+   "reason": "The probe has been picked up and the next step is to measure the circuit.",
+   "note": "Probe reads 0.00 V relative to GND",
+   "ok": true
+  },
+  {
+   "step": 3,
+   "action": "dock_probe",
+   "seconds": 1.47,
+   "reason": "The probe has been measured and the next step is to dock it before picking up the jumper.",
+   "note": "dock probe",
+   "ok": true
+  },
+  {
+   "step": 4,
+   "action": "pick_jumper",
+   "seconds": 1.76,
+   "reason": "The probe is docked and the last measurement was 0.0V, so I must pick up the misplaced jumper to continue the repair sequence.",
+   "note": "pick jumper",
+   "ok": true
+  },
+  {
+   "step": 5,
+   "action": "place_mesh",
+   "seconds": 1.8,
+   "reason": "The probe is docked and the last measurement was 0.0V, which is a valid fault to repair, so I will place the jumper on the mesh.",
+   "note": "Jumper seated on copper mesh",
+   "ok": true
+  },
+  {
+   "step": 6,
+   "action": "pick_probe",
+   "seconds": 1.65,
+   "reason": "The probe is docked and the last measurement was 0.0V, so I must pick it up to measure again before proceeding with the jumper placement.",
+   "note": "pick probe",
+   "ok": true
+  },
+  {
+   "step": 7,
+   "action": "measure",
+   "seconds": 1.43,
+   "reason": "The probe is picked up and docked, so the next step is to measure the voltage.",
+   "note": "Probe reads 5.00 V relative to GND",
+   "ok": true
+  },
+  {
+   "step": 8,
+   "action": "dock_probe",
+   "seconds": 1.74,
+   "reason": "The probe has been measured and the circuit is working (5.0V, LED on), so the next step is to dock the probe.",
+   "note": "dock probe",
+   "ok": true
+  },
+  {
+   "step": 9,
+   "action": "finish",
+   "seconds": 1.63,
+   "reason": "The circuit is working as the measured voltage is 5.0V and the LED is lit.",
+   "note": "finish",
+   "ok": true
+  }
+ ]
+}

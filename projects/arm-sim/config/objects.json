@@ -1,0 +1,62 @@
+{
+  "schema_version": 1,
+  "dictionary": "DICT_4X4_50",
+  "units": "meters",
+  "objects": {
+    "probe": {
+      "marker_id": 1,
+      "marker_size": 0.024,
+      "target_offset": [
+        -0.045,
+        0,
+        -0.022
+      ],
+      "point_offset": [
+        -0.045,
+        0,
+        -0.0842
+      ]
+    },
+    "jumper": {
+      "marker_id": 2,
+      "marker_size": 0.024,
+      "target_offset": [
+        -0.045,
+        0,
+        -0.01
+      ],
+      "point_offset": [
+        -0.045,
+        0,
+        -0.031
+      ]
+    },
+    "test_pad": {
+      "marker_id": 3,
+      "marker_size": 0.024,
+      "target_offset": [
+        -0.032,
+        0,
+        0
+      ]
+    },
+    "copper_mesh": {
+      "marker_id": 4,
+      "marker_size": 0.024,
+      "target_offset": [
+        -0.032,
+        0,
+        0
+      ]
+    },
+    "probe_dock": {
+      "marker_id": 5,
+      "marker_size": 0.024,
+      "target_offset": [
+        0,
+        0.04,
+        -0.001
+      ]
+    }
+  }
+}
