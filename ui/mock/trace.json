@@ -1,0 +1,124 @@
+{
+ "success": true,
+ "measurements": [
+  {
+   "point": "input",
+   "voltage": 5.0,
+   "valid_contact": true,
+   "led_on": false,
+   "after_replacement": false
+  },
+  {
+   "point": "output",
+   "voltage": 0.0,
+   "valid_contact": true,
+   "led_on": false,
+   "after_replacement": false
+  },
+  {
+   "point": "output",
+   "voltage": 2.0,
+   "valid_contact": true,
+   "led_on": true,
+   "after_replacement": true
+  }
+ ],
+ "steps": [
+  {
+   "step": 1,
+   "action": "pick_probe",
+   "seconds": 1.67,
+   "reason": "The first step in diagnosis is to measure the input voltage at TP1.",
+   "note": "pick probe",
+   "ok": true
+  },
+  {
+   "step": 2,
+   "action": "measure_input",
+   "seconds": 1.57,
+   "reason": "The first step in the replacement procedure is to measure the input voltage at TP1.",
+   "note": "TP1 (supply side) reads 5.00 V relative to GND",
+   "ok": true
+  },
+  {
+   "step": 3,
+   "action": "measure_output",
+   "seconds": 1.62,
+   "reason": "TP1 is 5V, so I must measure TP2 to check the resistor status.",
+   "note": "TP2 (LED anode) reads 0.00 V relative to GND",
+   "ok": true
+  },
+  {
+   "step": 4,
+   "action": "dock_probe",
+   "seconds": 1.63,
+   "reason": "TP1 is 5V and TP2 is 0V with the LED dark, indicating an open resistor.",
+   "note": "dock probe",
+   "ok": true
+  },
+  {
+   "step": 5,
+   "action": "remove_resistor",
+   "seconds": 1.8,
+   "reason": "TP1 is 5V and TP2 is 0V with the LED dark, indicating an open resistor.",
+   "note": "Pulled the resistor module out of the socket",
+   "ok": true
+  },
+  {
+   "step": 6,
+   "action": "discard_resistor",
+   "seconds": 2.86,
+   "reason": "The input is 5V and the output is 0V with the LED dark, indicating an open resistor that needs replacement, and the allowed actions are limited to discard or abort.",
+   "note": "Dropped the removed module in the reject bin",
+   "ok": true
+  },
+  {
+   "step": 7,
+   "action": "pick_spare",
+   "seconds": 1.9,
+   "reason": "The input is 5V and the output is 0V with the LED dark, indicating an open resistor, so a spare must be picked.",
+   "note": "Picked the spare 330 \u03a9 module from the caddy",
+   "ok": true
+  },
+  {
+   "step": 8,
+   "action": "insert_resistor",
+   "seconds": 1.84,
+   "reason": "TP1 is 5V and TP2 is 0V with the LED dark, indicating an open resistor that needs replacement.",
+   "note": "Spare module seated across both socket pads",
+   "ok": true
+  },
+  {
+   "step": 9,
+   "action": "pick_probe",
+   "seconds": 1.82,
+   "reason": "The circuit is currently under test with the spare resistor installed, and the next step is to measure the input and output voltages.",
+   "note": "pick probe",
+   "ok": true
+  },
+  {
+   "step": 10,
+   "action": "measure_output",
+   "seconds": 1.78,
+   "reason": "The input is 5V and the output is 0V with the LED dark, indicating an open resistor.",
+   "note": "TP2 (LED anode) reads 2.00 V relative to GND",
+   "ok": true
+  },
+  {
+   "step": 11,
+   "action": "dock_probe",
+   "seconds": 1.82,
+   "reason": "The circuit is healthy (TP1 5V, TP2 2V, LED lit) and no replacement is needed.",
+   "note": "dock probe",
+   "ok": true
+  },
+  {
+   "step": 12,
+   "action": "finish",
+   "seconds": 1.79,
+   "reason": "The circuit is healthy as TP1 is 5V, TP2 is approximately 2V, and the LED is lit.",
+   "note": "finish",
+   "ok": true
+  }
+ ]
+}
