@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Circuit workbench</title><link rel="stylesheet" href="/static/workbench.css"></head>
+<body><main>
+<header><div><small class="eyebrow">CIRCUIT LAB</small><h1>Your circuit workbench</h1><p>Gemma on the Jetson. Eyes on the board. Voice on your Mac.</p></div><button id="mute">Mute voice</button></header>
+<section class="connections" aria-label="Connections">
+<div><small>JETSON</small><strong id="jetson">Checking connection…</strong></div>
+<div><small>CAMERA</small><strong id="camera">Waiting for phone</strong></div>
+<div><small>SO101</small><strong>Not commissioned · motion disabled</strong></div>
+<div><small>BLUETOOTH INSTRUMENT</small><strong>Model and protocol needed</strong></div>
+</section>
+<p id="error" role="status"></p>
+<div class="columns"><section class="card camera-panel">
+<div class="section-heading"><h2>See the circuit</h2><button id="pause">Pause inspection</button></div>
+<div id="pairing"><img id="qr" src="/api/phone/qr" width="170" height="170" alt="Scan to pair phone camera"><div><p>Scan with your phone, open in Safari, then tap <strong>Start camera</strong>.</p><a id="link">Preparing camera link…</a><small>Keep the camera page visible and the phone unlocked.</small></div></div>
+<img id="preview" hidden alt="Latest image received from the paired camera">
+<p><strong id="status">Waiting for camera</strong><br><small id="details">Only the latest image is analyzed; no video backlog.</small></p>
+<div id="result" hidden><span class="tag" id="led"></span><p id="finding"></p></div>
+<small id="routing">Checking inference location…</small>
+</section>
+<section class="card"><h2>Talk with Gemma</h2><p class="hint">Type a question. The answer appears here and plays through your Mac’s speakers.</p>
+<div id="conversation" role="log" aria-live="polite"><p class="empty">Ask about the circuit or the next step.</p></div>
+<form id="chat"><label class="check"><input id="use-camera" type="checkbox"> Include the latest camera image</label>
+<label for="question" class="sr-only">Your question</label><textarea id="question" maxlength="4000" rows="3" placeholder="What should I check before swapping the resistor?" required></textarea>
+<div class="chat-actions"><small id="chat-status" role="status">Camera inspection pauses when you ask a question.</small><button type="submit" id="send">Ask Gemma</button></div></form>
+<button id="replay" hidden>Speak last reply</button>
+</section></div>
+<section class="card task"><div><small class="eyebrow">CURRENT TASK</small><h2>Probe → replace resistor → verify</h2><p>The wiring is intended to be correct. The faulty resistor and good spare have enlarged rectangular grips for the arm.</p></div>
+<ol><li>Probe the copper-mesh test surface and record a valid baseline reading.</li><li>Dock the probe, disconnect circuit power, and swap the resistor module.</li><li>Restore power, probe the same net again, and check the LED.</li></ol>
+<p class="hint">No live voltage readings or physical arm actions are connected yet. A zero reading needs valid contact, a known supply and the correct reference.</p></section>
+<footer>Camera uploads use the current HTTPS pairing route; a Cloudflare link relays the image through the internet. Gemma inference stays on the Jetson in workbench mode. <a href="/review">Legacy pin review</a> · <a href="/sim/">Simulator</a></footer>
+</main><script type="module" src="/static/workbench.mjs"></script></body></html>

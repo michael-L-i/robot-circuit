@@ -1,3 +1,5 @@
+> **Arm update:** The jumper MuJoCo demo uses the Seeed Studio reBot B601-RS (6+1 DOF). See [integration and hardware notes](REBOT-B601-RS.md). Older YAM results below are historical; the resistor demo and kinematic schematic retain YAM.
+
 # Arm Circuit Sim
 
 A local Gemma E4B task planner with a MuJoCo YAM Ultra robot, contact-based grasping, camera-measured targets, and electrical verification. Default: **MuJoCo physics + Camera / taught markers**. The older kinematic schematic and oracle-coordinate baseline remain explicit diagnostic options.

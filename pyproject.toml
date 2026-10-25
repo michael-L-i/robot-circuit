@@ -1,9 +1,15 @@
 [project]
 name = "robot-circuit"
 version = "0.1.0"
-description = "Local Gemma breadboard inspection with LiteRT-LM"
+description = "Circuit workbench: Jetson Gemma vision, phone camera, and Mac speech"
 requires-python = ">=3.12,<3.14"
-dependencies = ["fastapi==0.162.0", "uvicorn==0.54.0", "pillow==13.0.0", "litert-lm==0.18.1"]
+dependencies = [
+    "fastapi==0.162.0",
+    "uvicorn==0.54.0",
+    "pillow==13.0.0",
+    "litert-lm==0.18.1",
+    "qrcode==8.2",
+]
 [dependency-groups]
 dev = ["pytest==9.1.1", "httpx==0.28.1"]
 [tool.pytest.ini_options]

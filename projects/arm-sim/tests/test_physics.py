@@ -26,7 +26,7 @@ def test_already_connected_needs_no_repair():
 
 
 def test_missed_mesh_is_caught_by_post_placement_measurement():
-    world = run(placement_error_mm=28)
+    world = run(placement_error_mm=-28)  # miss inward, inside the RS top-down workspace
     assert not world.success and world.done
     assert 'never touched' in next(e['note'] for e in world.events if e['action'] == 'place_mesh')
     assert world.measurements[-1]['voltage'] == 0.0
@@ -54,7 +54,7 @@ def test_render_and_clip():
 def test_collision_guard_stops_motion_into_the_bench():
     world = PhysicsWorld()
     with pytest.raises(SkillError, match='Collision'):
-        world.bench.move([.45, .15, -.01], 0.)
+        world.bench.move([.30, 0, -.01], world.bench.yaw_for([.30, 0]))
 
 
 def test_failed_lift_keeps_tool_state_truthful(monkeypatch):

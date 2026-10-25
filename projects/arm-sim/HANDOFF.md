@@ -94,3 +94,17 @@ Final image-based Gemma run completed all nine actions with 0V → 5V and LED ON
 The live combined server is left running on port 8000 (PID 29085 at handoff; verify before managing processes), with ONE E4B engine warm and no autonomous loop active. RSS was approximately 1.7GiB after the final run, including renderer/model runtime buffers; no model copies or background training were started. Use Unload model if idle memory is preferred; do not start a second engine. The browser is left on the successful result in Bench webcam view; Reset starts a fresh camera-guided run. All 37 unique simulator tests have passed (36 in the full suite plus the final context regression), as have parent 26 Python/2 JS checks.
 
 Ownership is released to Claude. Further improvement should target physical calibration and noisy/occluded perception, not claim that the 20 ideal-camera/scripted trials establish hardware reliability. The user authorized updates/questions through Claude's remote-control connection; read COLLAB.md before concurrent edits.
+
+## 2026-10-24 — B601-RS arm migration
+
+User requested Seeed Studio reBot Arm B601-RS, 6+1 DOF. `/sim/` MuJoCo now uses pinned official RS MJCF/meshes (commit `44bc1ed11bc1c3c2db035b51507a6ecae34fc79c`). Model metadata, original XML, licenses, checksums and source provenance are in `arm_sim/assets/rebot_rs/`. Optional wrist-camera geometry is omitted (~65 MB robot assets total); the existing external perception camera is retained. No new model engine or robotics framework was installed.
+
+`physics/rebot.py` retains the upstream RS mechanism, inertias, six joint limits, two coupled sliding fingers and stock finger collision pieces. Task controller is an explicitly simulated gravity-compensated position servo, not the manufacturer's hardware POS_VEL controller. See `REBOT-B601-RS.md` for physical commissioning and adaptation requirements.
+
+RS-specific changes: fixed taught yaw 0, 125 mm home/transit, cubic speed profile, vertical-clearance routing before moving a held tool across fixtures, 45 mm probe guide with 1 mm sleeve clearance. The old cross-product IK error could accept a 180-degree orientation mismatch; RS now uses quaternion-log error and verifies truly downward TCP orientation. The independent resistor scene retains YAM and its existing motion/IK behavior; legacy kinematic schematic is explicitly labeled YAM.
+
+Validation: all **60 simulator tests passed** (including 5 camera-guided full-repair seeds, three oracle repair layouts, failures/collision guards, RS kinematic limits and downward-pose regression, and resistor regression tests). The missed-mesh test now injects -28 mm inward error so it remains inside the RS top-down workspace; +28 mm can be unreachable and correctly raises IK failure. These tests use scripted task choices, not a model reliability benchmark.
+
+Live server restarted on port 8000, PID 17174; a browser Gemma run is in progress. Final live evidence to follow. No hardware driver or hardware commands enabled.
+
+Final live validation: **9/9 Gemma-selected actions succeeded**, camera-guided RS model, 0V → 5V / LED ON, decision times 1.41–1.81s. Evidence: `evidence/rebot-rs-gemma-success.json`, `evidence/rebot-rs-ui.png`, `evidence/rebot-rs-initial.jpg`. Browser left at completed run; Reset then Run to repeat. One warm E4B engine, no autonomous loop. Server RSS around 2.7 GiB during playback. Ownership released.

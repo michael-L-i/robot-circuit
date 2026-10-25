@@ -63,3 +63,11 @@ Ownership: **Claude** — `resistor/{scene,bench,world}.py`, `config/resistor_ob
 - `resistor/{scene,bench,world}.py` + `config/resistor_objects.json` (marker IDs 6–11 new; probe 1 / dock 5 reused). `ResistorBench` subclasses demo-1 `Bench`; demo-1 files untouched.
 - Findings worth knowing for hardware (and for demo 1): demo-1 `Bench.move` starts/stops at full speed; that jerk swings a gripped probe ~6 mm off its planned tip offset, which is what made docking fail. Demo 2 overrides `move` with a cubic time scaling, lifts to a 15 cm transit height, and turns the wrist in place (~75°/s) before crossing — a straight diagonal dragged the probe over the socketed module. Fixed fixtures keep their last sighting when the arm occludes them; parts must be seen live. Any failed skill leaves only `abort`.
 - Verified: 20/20 camera-guided layouts (scripted), all four scenarios behave correctly, 57 tests pass, live E4B run 12/12 actions, 1.6–2.9 s/decision (`evidence/resistor-gemma-full-run.{mp4,json}`). Model rationales sometimes repeat stale facts (step 10 cites "0V" before measuring); allowed_actions keeps actions correct.
+
+## Codex active B601-RS migration (2026-10-24)
+User requested Seeed Studio reBot Arm B601-RS (6+1 DOF). Updating demo-1 physics arm with pinned official RS MJCF/meshes and adapter, testing existing repair sequence, updating UI/docs. Preserving demo-2 YAM behavior and original asset files. Please avoid demo-1 physics/UI edits until completion note. No hardware commands.
+### B601-RS integration validated
+All 60 simulator tests pass. Jumper MuJoCo now uses official RS arm/gripper; resistor remains YAM and passes regression tests. Pin/probe targets still come from rendered-camera markers. Important physical fixture changes and control limitations are in REBOT-B601-RS.md. New probe guide is 45 mm tall / 1 mm radial clearance. New pose solver rejects 180-degree orientation errors. Live E4B validation underway at port8000, PID17174; no overlapping edits needed.
+
+### B601-RS complete / ownership released
+Live E4B + camera run passed all 9 actions, 0V → 5V / LED ON, 1.41–1.81s decisions. Evidence and hardware caveats in HANDOFF.md and REBOT-B601-RS.md. Port8000 now serves the new arm for jumper demo; model warm, no loop running. User-facing browser left open at successful result.

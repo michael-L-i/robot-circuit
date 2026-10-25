@@ -1,4 +1,4 @@
-"""Guarded manipulation skills on the simulated YAM Ultra; electrical state comes from contacts."""
+"""Guarded manipulation skills on the simulated reBot B601-RS; electrical state comes from contacts."""
 import io
 from concurrent.futures import ThreadPoolExecutor
 import numpy as np
@@ -25,6 +25,9 @@ class SkillError(RuntimeError):
 
 class Bench:
     def __init__(self, jumper_xy=None, jumper_on_mesh=False):
+        # Taught parallel-jaw orientation for this bench; avoids the RS wrist limit.
+        self.yaw_for = lambda xy: 0.
+        self.home_pose = ([.28, 0, .125], 0.)
         self.m = scene.build()
         self.d = mujoco.MjData(self.m)
         self.scratch = mujoco.MjData(self.m)
@@ -52,10 +55,12 @@ class Bench:
                 self.d.qpos[adr+2] = scene.MESH['pos'][2]+scene.MESH['size'][2]+2*scene.JUMPER_PIN[2]+scene.JUMPER_HOUSING[2]
         mujoco.mj_forward(m, self.d)
         self._seat_jumper()
-        home = self.ik(*HOME, READY_Q)
+        from .rebot import READY_Q as REBOT_READY, FINGER_JOINTS
+        home = self.ik(*self.home_pose, REBOT_READY)
         self.d.qpos[self.arm_qadr] = home
         self.d.ctrl[:6], self.d.ctrl[6] = home, OPEN
-        self.d.qpos[m.joint('g_joint7').qposadr[0]] = self.d.qpos[m.joint('g_joint8').qposadr[0]] = OPEN
+        for name in FINGER_JOINTS:
+            self.d.qpos[m.joint(name).qposadr[0]] = OPEN
         self.settle(.4, record=False)
 
     # ---- state -------------------------------------------------------------------------
@@ -105,8 +110,16 @@ class Bench:
             mujoco.mj_kinematics(m, d)
             mujoco.mj_comPos(m, d)
             rot = d.site_xmat[self.site].reshape(3, 3)
-            err = np.concatenate([np.asarray(pos) - d.site_xpos[self.site],
-                                  .5*sum(np.cross(rot[:, i], target[:, i]) for i in range(3))])
+            if hasattr(self, 'home_pose'):
+                # Quaternion-log error also detects a 180-degree orientation mismatch.
+                quat = np.zeros(4)
+                mujoco.mju_mat2Quat(quat, (target @ rot.T).reshape(9))
+                if quat[0] < 0: quat *= -1
+                length = np.linalg.norm(quat[1:])
+                angle_error = quat[1:] * (2*np.arctan2(length, quat[0])/max(length, 1e-12))
+            else:
+                angle_error = .5*sum(np.cross(rot[:, i], target[:, i]) for i in range(3))
+            err = np.concatenate([np.asarray(pos) - d.site_xpos[self.site], angle_error])
             if np.linalg.norm(err[:3]) < 2e-4 and np.linalg.norm(err[3:]) < 2e-3:
                 return q
             mujoco.mj_jacSite(m, d, jp, jr, self.site)
@@ -132,9 +145,10 @@ class Bench:
     def move(self, pos, yaw, speed=.15, until=None):
         """Straight-line fingertip motion; stops early when `until()` becomes true (guarded move)."""
         start, pos = self.tcp(), np.asarray(pos, float)
-        n = max(1, int(np.ceil(np.linalg.norm(pos-start)/(speed*CONTROL_DT))))
+        n = max(1, int(np.ceil(1.5*np.linalg.norm(pos-start)/(speed*CONTROL_DT))))
         q = self.d.ctrl[:6].copy()
-        for p in np.linspace(start, pos, n+1)[1:]:
+        for t in np.linspace(0, 1, n+1)[1:]:
+            p = start + (pos-start)*(t*t*(3-2*t))
             q = self.ik(p, yaw, q)
             self.d.ctrl[:6] = q
             self.tick()
@@ -231,6 +245,10 @@ class Bench:
             y=np.array([np.cos(yaw),np.sin(yaw),0.]); z=np.array([0.,0.,-1.])
             off=np.column_stack([np.cross(y,z),y,z])@local
         above = np.array([*xy, surface_z]) + off
+        # Clear fixtures vertically before crossing the bench with a held tool.
+        transit_z = max(.125, above[2]+.025)
+        self.move([*self.tcp()[:2], transit_z], yaw)
+        self.move([*above[:2], transit_z], yaw)
         self.move(above + [0, 0, .03], yaw)
         contact = lambda: any(self.touching(*pair) for pair in target_geoms)
         self.move(above - [0, 0, depth], yaw, speed=.02, until=contact)
@@ -267,7 +285,7 @@ class Bench:
                             [('jumper_pin', 'copper_mesh'), ('jumper_pin', 'board')], seat=True)
 
     def home(self):
-        self.move(*HOME)
+        self.move(*getattr(self, "home_pose", HOME))
 
     # ---- visuals -----------------------------------------------------------------------
     def set_led(self, on):

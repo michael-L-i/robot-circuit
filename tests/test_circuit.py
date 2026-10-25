@@ -59,7 +59,8 @@ def test_image_inference_contract(monkeypatch,tmp_path,detailed):
         assert Image.open(path).size==(30,30)
         return {'pins':BASE,'summary':'test observation','uncertainties':[]}
     monkeypatch.setattr(module.vision,'analyze',fake)
-    buf=io.BytesIO();Image.new('RGB',(30,30)).save(buf,format='PNG')
+    from PIL import ImageDraw
+    buf=io.BytesIO();image=Image.new('RGB',(30,30));ImageDraw.Draw(image).rectangle((5,5,20,20),fill='white');image.save(buf,format='PNG')
     with TestClient(app) as client:
         r=client.post('/api/analyze',json={'image':base64.b64encode(buf.getvalue()).decode(),'detailed':detailed})
         assert r.status_code==200 and r.json()['requires_review']

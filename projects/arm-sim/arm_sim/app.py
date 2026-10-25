@@ -175,7 +175,7 @@ def unload():
 @app.get('/api/trace')
 def trace():
     with world_lock:
-        arm = 'YAM Ultra v2 MJCF + linear_4310 gripper, MuJoCo contacts' if isinstance(world, PhysicsWorld) else 'YAM Ultra v1 URDF, simplified links'
+        arm = 'Seeed reBot B601-RS MJCF + stock parallel gripper, MuJoCo contacts' if isinstance(world, PhysicsWorld) else 'YAM Ultra v1 URDF, simplified links'
         return dict(schema_version=1, simulation=True, arm=arm,
                     units='meters/radians/volts', state=world.snapshot())
 

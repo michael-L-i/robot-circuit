@@ -1,0 +1,28 @@
+# The Mac receives camera frames, displays responses, and plays speech.
+# The Jetson runs Ollama. No credentials belong in this file.
+[jetson]
+host = "192.168.0.169"
+user = "jetson"
+model = "gemma4:31b"
+tunnel_port = 11435
+
+[mac]
+port = 8000
+with_simulator = true
+https_phone = true
+
+[robot]
+model = "SO101"
+# USB controller and six motors verified on Mac; motion still requires calibration.
+host = "mac"
+serial_port = "/dev/cu.usbmodem5AE60583621"
+calibration_file = ""
+
+[measurement]
+# Camera observations are not electrical measurements.
+transport = "bluetooth"
+instrument_model = "Alientek DM40C"
+device_address = "FC8016EC-5C57-A4EF-F46C-AE5511E2ED26"
+protocol = "BLE FFF0 / FFF1 read request / FFF2 notifications"
+host = "mac"
+display_verified = false

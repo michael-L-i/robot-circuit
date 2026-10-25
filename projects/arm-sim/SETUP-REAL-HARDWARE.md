@@ -1,3 +1,5 @@
+> For the jumper demo’s current Seeed reBot B601-RS model and hardware commissioning requirements, see [REBOT-B601-RS.md](REBOT-B601-RS.md).
+
 # From this simulation to the hackathon bench
 
 ## What this version demonstrates

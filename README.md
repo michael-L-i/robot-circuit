@@ -1,6 +1,46 @@
-# Circuit Lab
+# Circuit workbench: Jetson + Mac
 
-A webcam-first breadboard inspection prototype for the AGI House Gemma hardware hackathon. Gemma 4 E4B repeatedly inspects the latest webcam frame locally through LiteRT-LM. Observations and tentative connection repairs update automatically while the video stays live. Pause analysis when you want to verify or edit lead positions.
+The current setup uses **Gemma 4 31B on the Jetson**, a phone camera, and the Mac for the dashboard and spoken replies. The task is **probe → replace the faulty resistor module → probe again and verify the LED**. Bluetooth measurement and physical SO101 motion still require hardware commissioning.
+
+```sh
+uv run --project projects/arm-sim --with qrcode==8.2 python scripts/run_workbench.py
+```
+
+Open http://127.0.0.1:8000. Scan the current QR to pair the phone, or type a question to hear Gemma through the Mac. See [SETUP.md](SETUP.md). This launcher supersedes the older commands below for the Jetson setup. Existing simulators retain their original local model.
+
+---
+
+## Earlier Mac-only prototype
+
+A phone-camera breadboard inspection prototype for the AGI House Gemma hardware hackathon. Gemma 4 E4B repeatedly inspects the latest webcam frame locally through LiteRT-LM. Observations and tentative connection repairs update automatically while the video stays live. Pause analysis when you want to verify or edit lead positions.
+
+## Legacy Mac-only camera mode
+
+```sh
+uv sync
+brew install cloudflared  # one-time HTTPS helper for Safari camera access
+uv run python scripts/run_mac.py --https-phone
+```
+
+Open **http://127.0.0.1:8000** on the Mac. Scan its QR using your iPhone/iPad Camera, open the **HTTPS** link in Safari, and tap **Start camera**. Allow camera access. Leave the device pointed at the circuit, Safari open and the device unlocked. A screen wake lock is requested when available.
+
+The rear camera remains live. The phone sends one resized JPEG (longest edge 1280 px) approximately every **10 seconds**; network time is added to that interval. Only the most recent frame is retained. A Mac background worker checks at most once per 10 seconds, reuses local Gemma 4 E4B, prints the finding to the terminal, and speaks it through the Mac speakers with local Kokoro. The dashboard can be closed after pairing: it is only status, pause, mute and the latest finding. The older pin editor is available at `/review`.
+
+Gemma reports LED appearance (`lit`, `unlit`, `uncertain`, `not_visible`), visible wiring issues, uncertainties and a practical next check. A colored LED body alone is not light emission. The checker does not measure voltage or electrical contact. Near-uniform/covered-lens frames are rejected before inference rather than inviting a circuit hallucination. A real board still needs user validation; visual fault hypotheses can be wrong.
+
+**Connection:** `--https-phone` starts a temporary Cloudflare Quick Tunnel, without an account, domain or certificate installation. Frames pass through Cloudflare's HTTPS relay; **Gemma and voice synthesis stay on the Mac**. Only the camera page, its static assets and token-authenticated frame upload route are exposed through the tunnel. The dashboard, pairing secret, model/speech APIs and simulator are blocked. The random pairing token is in the QR fragment and stored for that phone tab. Restarting the server requires rescanning. Stopping the launcher stops the tunnel. This path needs internet access; the phone can use any network that can reach the HTTPS link.
+
+**Strictly local alternative:** omit `--https-phone` and provide `--ssl-certfile PATH --ssl-keyfile PATH` with a certificate trusted by the iPhone. An untrusted certificate warning alone does not establish camera access. Ordinary HTTP LAN links cannot use Safari's live-camera API. Set `CIRCUIT_LAN_IP` if a VPN selects the wrong local interface.
+
+**Voice:** uses the existing local Kokoro service at `http://127.0.0.1:8880/v1/audio/speech`, voice `af_heart`. Override `CIRCUIT_TTS_URL` for another compatible local endpoint. macOS `say` is the fallback, and `afplay` outputs the generated WAV. No microphone access is needed. Identical consecutive spoken findings are not repeated. The live inspector starts automatically through `scripts/run_mac.py`; importing the API directly requires `CIRCUIT_AUTO_INSPECT=1` to enable the worker.
+
+**Preserve the simulator:** use this launcher instead (one process, one shared model):
+
+```sh
+uv run --project projects/arm-sim --with qrcode==8.2 python scripts/run_mac.py --with-simulator --https-phone
+```
+
+The simulator remains at `/sim/`. Do not launch a second model process on another port. Pause live inspection before using the legacy camera editor to avoid competing for inference. Phone frames stay in memory; the existing model API temporarily writes a JPEG then deletes it. No recording is saved.
 
 ## Run on an Apple Silicon Mac
 
@@ -12,7 +52,7 @@ uv run uvicorn circuit_lab.app:app --host 127.0.0.1 --port 8000
 
 Open http://127.0.0.1:8000 in Chrome or Safari. Allow camera access when prompted. If blocked, enable the browser under macOS System Settings → Privacy & Security → Camera. Uploading a photo works without camera access. Dependencies and the model have already been installed on the development Mac.
 
-After setup, the app serves all assets locally and performs inference on the Mac. No API key, cloud inference, CDN, telemetry integration, or remote camera upload is used. Capture images are sent only to the loopback server, temporarily written for inference, then deleted. Browser frames remain in memory until replaced or the tab closes. Model compilation caches remain in `.cache/`. Run with Wi-Fi off after installation to demonstrate offline operation.
+After setup, the app serves all assets locally and performs inference on the Mac. No API key, cloud inference, CDN, telemetry integration, or remote camera upload is used. With the loopback launch below, capture images are sent only to the loopback server, temporarily written for inference, then deleted. The phone launcher above additionally accepts paired camera uploads over the LAN or an explicit HTTPS relay. Browser frames remain in memory until replaced or the tab closes. Model compilation caches remain in `.cache/`. Run with Wi-Fi off after installation to demonstrate offline operation.
 
 ## First experiment
 
@@ -106,7 +146,7 @@ blue circle and white background, with no invented circuit. Requests took
 breadboard accuracy benchmark. No actual user breadboard image was available
 for this validation.
 
-25 Python tests and two live-loop JavaScript tests pass. Browser verification
+33 Python tests and two live-loop JavaScript tests pass (including phone pairing, latest-frame uploads, LED output validation, blank-frame rejection, local speech and HTTPS gateway restrictions). Browser verification
 with explicitly simulated pin data derived a positive-jumper E6 → E5 repair;
 location-varied tests cover both supply jumpers and both board halves.
 

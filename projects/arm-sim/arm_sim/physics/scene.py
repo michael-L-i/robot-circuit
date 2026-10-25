@@ -1,4 +1,4 @@
-"""MuJoCo scene: I2RT YAM Ultra (v2) + linear_4310 gripper over a breadboard repair bench.
+"""MuJoCo scene: Seeed Studio reBot B601-RS + stock gripper over a breadboard repair bench.
 
 World frame matches arm_sim.world: arm base at the origin, +x forward, +z up, metres.
 """
@@ -116,11 +116,11 @@ def _bench(spec):
     _cyl(w, 'gnd_wire', [.29, -.035, BOARD_TOP+.002, .26, -.035, BOARD_TOP+.002], .001, [.1, .1, .1, 1])
     _cyl(w, 'gnd_return', [.26, -.035, BOARD_TOP+.002, .3, .178, .016], .0012, [.1, .1, .1, 1],
          kind=mujoco.mjtGeom.mjGEOM_CAPSULE)
-    # probe dock: four walls with 3 mm clearance around the needle end of the probe
+    # Probe sleeve guide: 1 mm radial clearance, 45 mm tall; supports upright re-grasp.
     for i, (dx, dy) in enumerate([(1, 0), (-1, 0), (0, 1), (0, -1)]):
-        r = PROBE_HANDLE[0]+.0055
-        _box(w, f'dock{i}', [DOCK_XY[0]+dx*r, DOCK_XY[1]+dy*r, .015],
-             [.0025 if dx else r+.0025, .0025 if dy else r+.0025, .015], [.15, .15, .17, 1])
+        r = PROBE_HANDLE[0]+.0035
+        _box(w, f'dock{i}', [DOCK_XY[0]+dx*r, DOCK_XY[1]+dy*r, .0225],
+             [.0025 if dx else r+.0025, .0025 if dy else r+.0025, .0225], [.15, .15, .17, 1])
     _box(w, 'multimeter', [.16, -.2, .02], [.035, .05, .02], [.95, .75, .1, 1])
 
 
@@ -159,8 +159,8 @@ def _camera(spec, name, pos, target, fovy=45):
 
 
 def build():
-    spec = mujoco.MjSpec.from_file(str(ASSETS/'yam_ultra.xml'))
-    spec.meshdir = str(ASSETS/'meshes')
+    from .rebot import arm_spec
+    spec = arm_spec()
     spec.option.timestep = .002
     spec.option.integrator = mujoco.mjtIntegrator.mjINT_IMPLICITFAST
     spec.option.noslip_iterations = 3
@@ -168,7 +168,6 @@ def build():
     spec.visual.quality.shadowsize = 2048
     spec.add_texture(name='sky', type=mujoco.mjtTexture.mjTEXTURE_SKYBOX, builtin=mujoco.mjtBuiltin.mjBUILTIN_GRADIENT,
                      rgb1=[.16, .18, .22], rgb2=[.04, .05, .07], width=256, height=256)
-    _arm(spec)
     _bench(spec)
     _objects(spec)
     from .markers import add_markers
