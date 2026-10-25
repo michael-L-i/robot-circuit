@@ -18,7 +18,7 @@ from .phone import router as phone_router
 from .speech import router as speech_router
 from . import live
 from .assistant import router as assistant_router
-from .ollama import OllamaVision
+from .remote import RemoteVision, make_client
 
 @asynccontextmanager
 async def lifespan(application):
@@ -50,9 +50,9 @@ app.mount('/static', StaticFiles(directory=static), name='static')
 vision = LocalVision()
 # Keep the simulator's existing local engine intact; only camera inspection is routed.
 INFERENCE = os.getenv('CIRCUIT_INFERENCE', 'local')
-if INFERENCE not in ('local', 'ollama'):
-    raise ValueError('CIRCUIT_INFERENCE must be local or ollama')
-remote_vision = OllamaVision()
+if INFERENCE not in ('local', 'ollama', 'litert'):
+    raise ValueError('CIRCUIT_INFERENCE must be local, ollama or litert')
+remote_vision = RemoteVision(make_client(INFERENCE))
 lock = threading.Lock()
 
 class Capture(BaseModel):
@@ -70,8 +70,8 @@ def detailed_review():
 
 @app.get('/api/health')
 def health():
-    if INFERENCE == 'ollama':
-        return dict(model=remote_vision.client.model, backend='Jetson', runtime='Ollama',
+    if INFERENCE in ('ollama', 'litert'):
+        return dict(model=remote_vision.client.model, backend='Jetson', runtime='LiteRT-LM' if INFERENCE == 'litert' else 'Ollama',
                     busy=lock.locked(), model_present=None, loaded=None, local_only=False,
                     inference_location='Jetson over SSH; no cloud inference', speaker='Mac')
     return dict(model_present=MODEL.is_file(), model=MODEL.name, backend=BACKEND, vision_backend=VISION_BACKEND, thinking=THINKING,
@@ -107,15 +107,15 @@ def analyze(capture: Capture):
                         spoken_feedback='I cannot see enough detail in this frame to check the LED. Check that the camera is uncovered and pointed at the board.',
                         uncertainties=['Near-uniform image; circuit details are not visible.'], next_view='Point the camera at the circuit in good light.',
                         pin_evidence={}, pins=Pins().model_dump(), seconds=round(time.monotonic()-start, 2),
-                        model=remote_vision.client.model if INFERENCE == 'ollama' else MODEL.name,
+                        model=remote_vision.client.model if INFERENCE in ('ollama', 'litert') else MODEL.name,
                         detailed=capture.detailed, requires_review=True, quality_rejected=True)
         with tempfile.TemporaryDirectory(prefix='circuit-') as directory:
             path = Path(directory) / 'frame.jpg'
             image.save(path, quality=95)
-            provider = remote_vision if INFERENCE == 'ollama' else vision
+            provider = remote_vision if INFERENCE in ('ollama', 'litert') else vision
             result = provider.analyze(path, detailed=capture.detailed, simple=capture.live)
         return {**result, 'seconds': round(time.monotonic()-start, 2),
-                'model': remote_vision.client.model if INFERENCE == 'ollama' else MODEL.name,
+                'model': remote_vision.client.model if INFERENCE in ('ollama', 'litert') else MODEL.name,
                 'detailed': capture.detailed, 'requires_review': True}
     except HTTPException:
         raise

@@ -6,11 +6,11 @@ from fastapi import APIRouter, HTTPException, Request
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
 from . import phone
-from .ollama import OllamaClient
+from .remote import make_client
 from .task import CONTEXT, TASK
 
 router = APIRouter()
-client = OllamaClient()
+client = make_client()
 SYSTEM = CONTEXT + '''\nYou are the voice assistant at a circuit inspection workbench.
 You run on the Jetson; the user's Mac displays and speaks your answers.
 Keep answers conversational and concise, normally under 120 words.

@@ -1,0 +1,11 @@
+{
+  "default": {
+    "backend": "gpu",
+    "vision_backend": "gpu",
+    "max_num_tokens": 8192,
+    "thinking": false,
+    "thinking_budget": 0,
+    "temperature": 0.1,
+    "cache": "disk"
+  }
+}

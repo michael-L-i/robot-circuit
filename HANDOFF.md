@@ -63,3 +63,18 @@ User explicitly requested removing canned narration and adding a one-shot board-
 `Analyze board` freezes the latest phone upload (<=30s old), passes exactly that image to the existing Jetson Ollama gemma4:31b through localhost11435, and returns actual model text plus frame/image provenance. No simulator events or canned task lines, no autoplay/mock mode. Local `/api/speak` generates Kokoro audio (existing macOS fallback), the browser plays it on the Mac, and actual audio playing/pause/ended events drive the orb. Stop voice cancels playback; Play voice replays audio without another analysis. One in-flight analysis guarded in UI and server; stale frames/errors show honest messages. No files/images stored by the app and no autonomous loop/motor commands.
 
 Verified browser run: real frame1533, Gemma response displayed, 25.75s audio observed actively playing, body class `speaking`; screenshot `.cache/live-board-voice.png`. Three focused frame-selection/staleness tests pass (`tests/test_voice_ui.py`), JS/Python syntax checks pass, `/mock/trace.json` returns404. This UI currently receives camera images only, not live DM40C readings. The phone upload is periodic, so the click selects latest upload rather than triggering a phone shutter. Run command and prerequisites in `ui/README.md`.
+
+## LiteRT-LM replacement requested — pending Jetson SSH access
+User requested replacing Ollama with LiteRT-LM and verifying the demo. Active Ollama demo has NOT been cut over. SSH BatchMode to jetson@192.168.0.169 still fails authentication; the existing non-multiplexed port11435 tunnel permits Ollama HTTP only, not shell/install access. Asked user to open `ssh -M -S /tmp/robot-circuit-jetson-control -N jetson@192.168.0.169`; no control socket exists yet.
+
+Prepared: `circuit_lab/litert_remote.py` (official OpenAI image/SSE adapter, no silent fallback), `remote.py` factory, optional `litert` routing in app/chat/voice UI, runtime-aware launcher, `config/workbench-litert.toml` and `config/litert/{server.json,README.md}`. Existing provider defaults retained until hardware validation. Profile initially targets Gemma E4B, not 31B. 50 root tests pass, including four new adapter tests.
+
+Actual local validation: temporary official LiteRT-LM 0.18.1 server on Mac port11437, GPU text + vision, existing E4B model. Real camera frame587 completed in8.71s, and SSE and structured JSON calls passed. This is explicitly a Mac compatibility test, NOT Jetson validation. Test server PID62411 was stopped afterward to release memory; a hard-linked test registry entry `circuit-litert-test-e4b` remains, no duplicate model bytes downloaded. Exact next steps in config/litert/README.md: obtain SSH, inspect Jetson hardware/graphics/memory, install isolated ARM64 runtime, transfer/register compatible model, test real image on Jetson, then switch UI and workbench. Keep Claude's robot files untouched; they have ongoing changes.
+
+LiteRT transfer preparation: downloaded Linux aarch64 LiteRT-LM 0.18.1 plus
+all resolved wheels to `.cache/litert-jetson-transfer/`. Bundle targets Python
+3.12 / glibc >= 2.27, with pinned requirements, checksum manifest, guarded
+installer and GPU server config. Existing E4B weights are hard-linked into the
+bundle (no extra model copy). No remote install or live cutover yet; SSH auth
+still blocks transfer. See config/litert/README.md. Installer syntax checked;
+Linux wheels cannot be runtime-tested on the Mac.

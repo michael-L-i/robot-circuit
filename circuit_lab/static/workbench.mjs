@@ -34,7 +34,7 @@ async function refresh() {
 async function connections() {
   try { const info=await json('/api/system');
     $('jetson').textContent = info.inference.reachable ? info.inference.model_present ? `${info.inference.model} · ready` : 'Connected · model missing' : 'Disconnected · check launcher';
-    $('routing').textContent = info.inspection_provider === 'ollama' ? 'Images → Jetson Gemma · spoken findings → Mac speakers' : 'Camera inspection uses the local Mac model. Chat requires the Jetson tunnel.';
+    $('routing').textContent = ['ollama','litert'].includes(info.inspection_provider) ? 'Images → Jetson Gemma · spoken findings → Mac speakers' : 'Camera inspection uses the local Mac model. Chat requires the Jetson tunnel.';
   } catch(error) { $('jetson').textContent=error.message; }
 }
 async function setting(body) { await json('/api/live/settings',body); await refresh(); }

@@ -21,6 +21,9 @@ def main():
     args = parser.parse_args()
     config = tomllib.loads(args.config.read_text())
     jetson, mac = config['jetson'], config['mac']
+    runtime = jetson.get('runtime', 'ollama')
+    if runtime not in ('ollama', 'litert'): parser.error('Unknown Jetson runtime')
+    remote_port = int(jetson.get('remote_port', 9379 if runtime == 'litert' else 11434))
     if not args.check:
         with socket.socket() as probe:
             if probe.connect_ex(('127.0.0.1', mac['port'])) == 0:
@@ -34,29 +37,31 @@ def main():
     url = f'http://127.0.0.1:{port}'
     print(f'Connecting to {target}. Enter its SSH password if prompted.', flush=True)
     # A real session keeps multiplexed SSH in the foreground for lifecycle monitoring.
-    tunnel = subprocess.Popen(ssh + ['-T', '-L', f'127.0.0.1:{port}:127.0.0.1:11434', target, 'exec sleep infinity'])
+    tunnel = subprocess.Popen(ssh + ['-T', '-L', f'127.0.0.1:{port}:127.0.0.1:{remote_port}', target, 'exec sleep infinity'])
     server = None
     try:
         for _ in range(120):
             if tunnel.poll() is not None:
                 raise RuntimeError('SSH tunnel exited. Check the address, login, and whether the tunnel port is occupied.')
             try:
-                with urllib.request.urlopen(url + '/api/tags', timeout=1) as response:
-                    models = [m['name'] for m in json.load(response)['models']]
+                with urllib.request.urlopen(url + ('/v1/models' if runtime == 'litert' else '/api/tags'), timeout=1) as response:
+                    data = json.load(response)
+                    models = [m['id'] for m in data['data']] if runtime == 'litert' else [m['name'] for m in data['models']]
                 if jetson['model'] not in models:
                     raise RuntimeError(f"Model {jetson['model']} is not installed on the Jetson.")
                 break
             except (OSError, ValueError):
                 time.sleep(.5)
         else:
-            raise RuntimeError('Jetson did not become ready. Check SSH and the Ollama service.')
+            raise RuntimeError('Jetson did not become ready. Check SSH and the configured inference service.')
         print(f"Ready: {jetson['model']} on Jetson. Speech output: this Mac.", flush=True)
         if args.check:
             subprocess.run(ssh + [target, 'python3 -'], input=(ROOT / 'scripts/jetson_status.py').read_text(),
                            text=True, check=True, timeout=30)
             return
-        env = dict(os.environ, CIRCUIT_INFERENCE='ollama', CIRCUIT_OLLAMA_URL=url,
-                   CIRCUIT_OLLAMA_MODEL=jetson['model'])
+        env = dict(os.environ, CIRCUIT_INFERENCE=runtime, CIRCUIT_REMOTE_RUNTIME=runtime)
+        prefix = 'CIRCUIT_LITERT' if runtime == 'litert' else 'CIRCUIT_OLLAMA'
+        env[prefix+'_URL'], env[prefix+'_MODEL'] = url, jetson['model']
         command = [sys.executable, str(ROOT / 'scripts/run_mac.py'), '--port', str(mac['port'])]
         if mac.get('with_simulator'):
             command.append('--with-simulator')
@@ -82,7 +87,7 @@ def main():
                     process.wait()
         if args.ssh_control_path:
             subprocess.run(ssh + ['-O', 'cancel', '-L',
-                           f'127.0.0.1:{port}:127.0.0.1:11434', target],
+                           f'127.0.0.1:{port}:127.0.0.1:{remote_port}', target],
                            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
 

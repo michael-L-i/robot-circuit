@@ -12,7 +12,7 @@ import urllib.request
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
-from circuit_lab.ollama import OllamaClient
+from circuit_lab.remote import make_client
 
 HERE = Path(__file__).resolve().parent
 analysis_lock = threading.Lock()
@@ -44,7 +44,7 @@ def analyze_frame(frame, client):
 
 
 def make_handler(upstream, client=None):
-    client = client or OllamaClient()
+    client = client or make_client()
     class Handler(http.server.SimpleHTTPRequestHandler):
         def __init__(self,*a,**kw): super().__init__(*a,directory=str(HERE),**kw)
         def log_message(self,*args): pass
@@ -60,9 +60,9 @@ def make_handler(upstream, client=None):
         def do_GET(self):
             if self.path == '/api/status':
                 try:
-                    system=fetch_json(upstream+'/api/system')
+                    inference=client.status()
                     state=fetch_json(upstream+'/api/live/state')
-                    return self.send_data(dict(inference=system['inference'],received_at=state.get('received_at')))
+                    return self.send_data(dict(inference=inference,received_at=state.get('received_at')))
                 except Exception:
                     return self.send_data({'detail':'Camera workbench unavailable on port 8000.'},503)
             if self.path.startswith('/api/') or self.path.startswith('/mock/'):
@@ -97,9 +97,10 @@ def make_handler(upstream, client=None):
 if __name__ == '__main__':
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--port',type=int,default=8100)
+    parser.add_argument('--runtime',choices=['litert','ollama'],default=None)
     parser.add_argument('--upstream',default='http://127.0.0.1:8000')
     args=parser.parse_args()
     socketserver.ThreadingTCPServer.allow_reuse_address=True
-    with socketserver.ThreadingTCPServer(('127.0.0.1',args.port),make_handler(args.upstream.rstrip('/'))) as server:
+    with socketserver.ThreadingTCPServer(('127.0.0.1',args.port),make_handler(args.upstream.rstrip('/'),make_client(args.runtime))) as server:
         print(f'Live board voice: http://127.0.0.1:{args.port}',flush=True)
         server.serve_forever()
